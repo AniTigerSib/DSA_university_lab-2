@@ -2,9 +2,7 @@
 #define SEQUENCE_SORT_HPP
 
 #include <sys/types.h>
-
-#define MINIMAL_SEQUENCE_VAL 0
-#define MAXIMAL_SEQUENCE_VAL 1e7
+#include <cstdlib>
 
 // #define digit(A,R) ((uchar*)&A)[R]
 

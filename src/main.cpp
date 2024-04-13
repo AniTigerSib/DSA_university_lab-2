@@ -4,11 +4,6 @@
 #include "sequence_sort.hpp"
 #include "sequence_test.hpp"
 
-// #define FUNC_NUM_TO_TEST 1
-// 0 - InsertionSortWithKey
-// 1 - ShellSort
-// 2 - MSD
-
 #define TEST_CASES_NUM 10
 #define GENERATE_FUNC_NUM 4
 #define INSERTION_MIN_SEQ_SIZE 1e4
@@ -32,6 +27,10 @@ int* AH = NULL; // For MSD_2/4/8
 
 int main(int argc, char** argv) {
     const TestFunction functions_to_test[4] = {InsertionSortWithKey, ShellSort, MSD, MSDG};
+    if (argc != 4) {
+        std::cout << "Not correct amount of command line params\n";
+        return 0;
+    }
     g_size_of_sequence = atoi(argv[1]);
     g_seq_step = atoi(argv[2]);
     g_func_to_test_num = atoi(argv[3]);
@@ -72,7 +71,6 @@ int TestFunctionsForCorrectSorting(const TestFunction* func_to_test, const int f
 }
 
 void TimesPrint(TestFunction func_to_test) {
-    int sequence_step = 0;
     for (int i = 0; i < TEST_CASES_NUM; i++) {
         std::cout << g_size_of_sequence;
         for (int j = 0; j < GENERATE_FUNC_NUM; j++) {
@@ -84,12 +82,11 @@ void TimesPrint(TestFunction func_to_test) {
             free(sequence);
         }
         std::cout << std::endl;
-        g_size_of_sequence += sequence_step;
+        g_size_of_sequence += g_seq_step;
     }
 }
 
 void ComparesPrint(TestFunction func_to_test) {
-    int sequence_step = 0;
     for (int i = 0; i < TEST_CASES_NUM; i++) {
         std::cout << g_size_of_sequence;
         for (int j = 0; j < GENERATE_FUNC_NUM; j++) {
@@ -101,7 +98,7 @@ void ComparesPrint(TestFunction func_to_test) {
             free(sequence);
         }
         std::cout << std::endl;
-        g_size_of_sequence += sequence_step;
+        g_size_of_sequence += g_seq_step;
     }
 }
 
@@ -165,6 +162,7 @@ void ShellSort(int* data, int size) {
     }
 }
 
+// MSD_1
 void MSD(int* data, int size) {
     int i = 0;
     uint Mask = 0;
@@ -194,7 +192,6 @@ int MSDPatrition(int* data, int low, int high, uint Mask) {
         while ((!(Mask & (uint)data[++i])) && i < high);
         while (((Mask & (uint)data[--j])) && j > low);
         if (i >= j) break;
-        g_compare_count++;
         Swap(data[i], data[j]);
     }
     return (i == j && i == high) ? ++i : i;
@@ -209,14 +206,24 @@ int MSDPatrition(int* data, int low, int high, uint Mask) {
 
 void MSDG(int* data, int size) {
     AH = (int*)malloc(sizeof(int) * size);
-    MSRadix_8(data, 0, size - 1, 3);
-    MSRadix_4(data, 0, size - 1, 3);
-    MSRadix_2(data, 0, size - 1, 3);
+    switch(g_msd_sort_num) {
+    case 0:
+        MSRadix_2(data, 0, size - 1, 15);
+        break;
+    case 1:
+        MSRadix_4(data, 0, size - 1, 7);
+        break;
+    case 2:
+        MSRadix_8(data, 0, size - 1, 3);
+        break;
+    default:
+        break;
+    }
     free(AH);
 }
 
 #define digit(A,R) (((int)A >> (R*8)) & 0xFF)
-
+// MSD_8
 void MSRadix_8(int* A, int low, int high, int R) {
     int i, Cnt[257] = {0};
     if (R < 0) return;
@@ -235,7 +242,7 @@ void MSRadix_8(int* A, int low, int high, int R) {
 
 #undef digit
 #define digit(A,R) (((int)A >> (R*4)) & 0xF)
-
+// MSD_4
 void MSRadix_4(int* A, int low, int high, int R) {
     int i, Cnt[17] = {0};
     if (R < 0) return;
@@ -253,8 +260,8 @@ void MSRadix_4(int* A, int low, int high, int R) {
 }
 
 #undef digit
-#define digit(A,R) (((int)A >> (R*2)) & 0x03)
-
+#define digit(A,R) (((int)A >> (R*2)) & 0x3)
+// MSD_2
 void MSRadix_2(int* A, int low, int high, int R) {
     int i, Cnt[5] = {0};
     if (R < 0) return;
