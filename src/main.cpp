@@ -4,7 +4,7 @@
 #include "sequence_sort.hpp"
 #include "sequence_test.hpp"
 
-#define FUNC_NUM_TO_TEST 1
+// #define FUNC_NUM_TO_TEST 1
 // 0 - InsertionSortWithKey
 // 1 - ShellSort
 // 2 - MSD
@@ -12,26 +12,45 @@
 #define TEST_CASES_NUM 10
 #define GENERATE_FUNC_NUM 4
 #define INSERTION_MIN_SEQ_SIZE 1e4
-#define MIN_SEQ_SIZE 5e5
 #define INSERTION_SORT_SEQ_CASE_STEP 5e3
-#define SORT_SEQ_CASE_STEP 5e5
+// #define MIN_SEQ_SIZE 5e5
+// #define SORT_SEQ_CASE_STEP 5e5
 
-int g_size_of_sequence = 5e6;
+int g_size_of_sequence = 0;
+int g_seq_step = 0;
+int g_func_to_test_num = 0;
+// 0 - InsertionSortWithKey
+// 1 - ShellSort
+// 2 - MSD_1
+// 3 - MSD_2
+// 4 - MSD_4
+// 5 - MSD_8
+int g_msd_sort_num = 0;
+
 long g_compare_count = 0;
 int* AH = NULL; // For MSD_2/4/8
 
-int main() {
-    // const TestFunction functions_to_test[3] = {InsertionSortWithKey, ShellSort, MSD};
+int main(int argc, char** argv) {
+    const TestFunction functions_to_test[4] = {InsertionSortWithKey, ShellSort, MSD, MSDG};
+    g_size_of_sequence = atoi(argv[1]);
+    g_seq_step = atoi(argv[2]);
+    g_func_to_test_num = atoi(argv[3]);
+    if (g_func_to_test_num > 2) {
+        g_msd_sort_num = g_func_to_test_num - 3;
+        g_func_to_test_num = 3;
+    }
+    
+
     // int* sequence = (int*)calloc(g_size_of_sequence, sizeof(int));
     // GenerateSawtoothSequence(sequence, g_size_of_sequence, MINIMAL_SEQUENCE_VAL, MAXIMAL_SEQUENCE_VAL);
     // GenerateSortedSquence(sequence, g_size_of_sequence, false);
 
     // std::cout << TestFunctionsForCorrectSorting(functions_to_test, 3);
 #ifdef TIME_TEST
-    TimesPrint(functions_to_test[FUNC_NUM_TO_TEST]);
+    TimesPrint(functions_to_test[g_func_to_test_num]);
 #endif
 #ifdef COMPARE_COUNT_TEST
-    ComparesPrint(functions_to_test[FUNC_NUM_TO_TEST]);
+    ComparesPrint(functions_to_test[g_func_to_test_num]);
 #endif
 
     // MSDG(sequence, g_size_of_sequence);
@@ -54,13 +73,6 @@ int TestFunctionsForCorrectSorting(const TestFunction* func_to_test, const int f
 
 void TimesPrint(TestFunction func_to_test) {
     int sequence_step = 0;
-    if (func_to_test == InsertionSortWithKey) {
-        g_size_of_sequence = INSERTION_MIN_SEQ_SIZE;
-        sequence_step = INSERTION_SORT_SEQ_CASE_STEP;
-    } else {
-        g_size_of_sequence = MIN_SEQ_SIZE;
-        sequence_step = SORT_SEQ_CASE_STEP;
-    }
     for (int i = 0; i < TEST_CASES_NUM; i++) {
         std::cout << g_size_of_sequence;
         for (int j = 0; j < GENERATE_FUNC_NUM; j++) {
@@ -78,13 +90,6 @@ void TimesPrint(TestFunction func_to_test) {
 
 void ComparesPrint(TestFunction func_to_test) {
     int sequence_step = 0;
-    if (func_to_test == InsertionSortWithKey) {
-        g_size_of_sequence = INSERTION_MIN_SEQ_SIZE;
-        sequence_step = INSERTION_SORT_SEQ_CASE_STEP;
-    } else {
-        g_size_of_sequence = MIN_SEQ_SIZE;
-        sequence_step = SORT_SEQ_CASE_STEP;
-    }
     for (int i = 0; i < TEST_CASES_NUM; i++) {
         std::cout << g_size_of_sequence;
         for (int j = 0; j < GENERATE_FUNC_NUM; j++) {
@@ -202,17 +207,11 @@ int MSDPatrition(int* data, int low, int high, uint Mask) {
 // Объяснить в отчете
 
 
-void MSDG(int* A, int size) {
+void MSDG(int* data, int size) {
     AH = (int*)malloc(sizeof(int) * size);
-#ifdef MSD_8
-    MSRadix_8(A, 0, size - 1, 3);
-#endif
-#ifdef MSD_4
-    MSRadix_4(A, 0, size - 1, 3);
-#endif
-#ifdef MSD_2
-    MSRadix_2(A, 0, size - 1, 3);
-#endif
+    MSRadix_8(data, 0, size - 1, 3);
+    MSRadix_4(data, 0, size - 1, 3);
+    MSRadix_2(data, 0, size - 1, 3);
     free(AH);
 }
 
