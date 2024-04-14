@@ -7,6 +7,7 @@
 // #define digit(A,R) ((uchar*)&A)[R]
 
 int IsBigger(int a, int b);
+int Compare(const void* a, const void* b);
 void Swap(int& a, int& b);
 void InsertionSortWithKey(int* data, int size);
 void ShellSort(int* data, int size);

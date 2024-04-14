@@ -1,5 +1,5 @@
 CPP=g++
-CFLAGS:=-Wall -Werror -Wextra -g -c
+CFLAGS:=-Wall -Wextra -g -c
 FOLDER=../build/
 OBJS1=$(addprefix $(FOLDER),main_with_time.o sequence_gen.o sequence_test.o)
 OBJS2=$(addprefix $(FOLDER),main_with_count.o sequence_gen.o sequence_test.o)
@@ -25,10 +25,10 @@ main.o: main.cpp sequence_gen.hpp
 	$(CPP) $(CFLAGS) $< -o $(FOLDER)$@
 
 main_with_time.o: main.cpp sequence_gen.hpp
-	$(CPP) $(CFLAGS) -D TIME_TEST $< -o $(FOLDER)$@
+	$(CPP) $(CFLAGS) -D TIME_TEST -D QUICK_STD_TEST $< -o $(FOLDER)$@
 
 main_with_count.o: main.cpp sequence_gen.hpp
-	$(CPP) $(CFLAGS) -D COMPARE_COUNT_TEST $< -o $(FOLDER)$@
+	$(CPP) $(CFLAGS) -D COMPARE_COUNT_TEST -D QUICK_STD_TEST $< -o $(FOLDER)$@
 
 sequence_gen.o: sequence_gen.cpp sequence_gen.hpp
 	$(CPP) $(CFLAGS) $< -o $(FOLDER)$@

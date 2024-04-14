@@ -1,3 +1,4 @@
+#include <cstdlib>
 #include <iostream>
 
 #include "sequence_gen.hpp"
@@ -20,9 +21,10 @@ int g_func_to_test_num = 0;
 // 3 - MSD_2
 // 4 - MSD_4
 // 5 - MSD_8
+// 6 - qsort
 int g_msd_sort_num = 0;
 
-long g_compare_count = 0;
+long long g_compare_count = 0;
 int* AH = NULL; // For MSD_2/4/8
 
 int main(int argc, char** argv) {
@@ -53,6 +55,7 @@ int main(int argc, char** argv) {
 #endif
 
     // MSDG(sequence, g_size_of_sequence);
+    // qsort(sequence, g_size_of_sequence, sizeof(int), Compare);
     // std::cout << SequenceSortedTest(sequence, g_size_of_sequence) << std::endl;
 
     return 0;
@@ -104,7 +107,11 @@ void ComparesPrint(TestFunction func_to_test) {
 
 float TimeOfSortingTest(TestFunction func_to_test, int* seq, int length) {
     auto start = std::chrono::steady_clock::now();
+#ifdef QUICK_STD_TEST
+    qsort(seq, length, sizeof(int), Compare);
+#else
     func_to_test(seq, length);
+#endif
     auto elapsed =
         std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - start);
     return elapsed.count() / 1e3;
@@ -112,13 +119,21 @@ float TimeOfSortingTest(TestFunction func_to_test, int* seq, int length) {
 
 long CompareCountTest(TestFunction func_to_test, int* seq, int length) {
     g_compare_count = 0;
+#ifdef QUICK_STD_TEST
+    qsort(seq, length, sizeof(int), Compare);
+#else
     func_to_test(seq, length);
+#endif
     return g_compare_count;
 }
 
 int IsBigger(int a, int b) {  // Прикрутить счетчик сравнений
     g_compare_count++;
     return a > b ? 1 : 0;
+}
+
+int Compare(const void* a, const void* b) {
+    return IsBigger(*(int*)a, *(int*)b);
 }
 
 void Swap(int& a, int& b) {
